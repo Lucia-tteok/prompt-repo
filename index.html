@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>提示词储存库</title>
+<style>
+  :root {
+    --emerald-deep: #0b3d2e;
+    --emerald: #146b47;
+    --emerald-light: #2e9e6b;
+    --emerald-mist: #d7f0e2;
+    --gold: #e3b23c;
+    --gold-soft: #f2d98b;
+    --cream: #f7f4e9;
+    --ink: #1c2b24;
+    --shadow: rgba(11, 61, 46, 0.25);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+    background:
+      radial-gradient(circle at 20% 10%, rgba(46, 158, 107, 0.18), transparent 40%),
+      radial-gradient(circle at 80% 90%, rgba(227, 178, 60, 0.15), transparent 45%),
+      linear-gradient(160deg, #0b3d2e 0%, #0f4d38 40%, #14603f 100%);
+    background-attachment: fixed;
+    color: var(--ink);
+    min-height: 100vh;
+  }
+  header { text-align: center; padding: 46px 20px 30px; position: relative; }
+  .title {
+    font-size: clamp(30px, 6vw, 52px);
+    font-weight: 800; letter-spacing: 4px; color: var(--cream);
+    text-shadow: 0 2px 0 var(--emerald-deep), 0 6px 20px rgba(0,0,0,0.4);
+  }
+  .title .leaf { color: var(--gold-soft); }
+  .subtitle {
+    margin-top: 12px; color: var(--emerald-mist);
+    font-size: 15px; letter-spacing: 2px; opacity: 0.85;
+  }
+  .subtitle::before, .subtitle::after {
+    content: "✦"; color: var(--gold); margin: 0 10px; font-size: 12px;
+  }
+  .toolbar {
+    max-width: 1100px; margin: 0 auto 24px; padding: 0 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 14px;
+  }
+  .search-box { flex: 1; min-width: 200px; max-width: 420px; position: relative; }
+  .search-box input {
+    width: 100%; padding: 12px 16px 12px 42px; border: none; border-radius: 30px;
+    background: rgba(247, 244, 233, 0.95); font-size: 14px; outline: none;
+    box-shadow: 0 4px 14px var(--shadow);
+  }
+  .search-box::before {
+    content: "🔍"; position: absolute; left: 15px; top: 50%;
+    transform: translateY(-50%); font-size: 15px; opacity: 0.6;
+  }
+  .btn-add {
+    display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px;
+    border: none; border-radius: 30px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-soft));
+    color: var(--emerald-deep); font-size: 15px; font-weight: 700; cursor: pointer;
+    box-shadow: 0 4px 16px rgba(227, 178, 60, 0.45); transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn-add:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(227, 178, 60, 0.6); }
+  .btn-add:active { transform: translateY(0); }
+  .gallery {
+    max-width: 1100px; margin: 0 auto; padding: 0 20px 60px;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 22px;
+  }
+  .card {
+    background: var(--cream); border-radius: 18px; overflow: hidden; cursor: pointer;
+    box-shadow: 0 6px 20px var(--shadow); transition: transform 0.2s, box-shadow 0.2s;
+    border: 2px solid transparent; position: relative;
+  }
+  .card:hover {
+    transform: translateY(-6px); box-shadow: 0 14px 32px rgba(11, 61, 46, 0.4);
+    border-color: var(--gold-soft);
+  }
+  .card-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; background: var(--emerald-mist); }
+  .card-badge {
+    position: absolute; top: 12px; right: 12px; background: rgba(11, 61, 46, 0.8);
+    color: var(--gold-soft); font-size: 12px; padding: 4px 10px; border-radius: 20px; backdrop-filter: blur(4px);
+  }
+  .card-body { padding: 14px 16px 18px; }
+  .card-title {
+    font-size: 16px; font-weight: 700; color: var(--emerald-deep); margin-bottom: 6px;
+    display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .card-desc {
+    font-size: 13px; color: #5a6b62; line-height: 1.5;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .empty { grid-column: 1 / -1; text-align: center; padding: 70px 20px; color: var(--emerald-mist); }
+  .empty .emoji { font-size: 60px; display: block; margin-bottom: 16px; }
+  .empty p { font-size: 16px; opacity: 0.85; }
+  .overlay {
+    position: fixed; inset: 0; background: rgba(7, 32, 24, 0.7); backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center; padding: 20px; z-index: 100;
+  }
+  .overlay.show { display: flex; }
+  .modal {
+    background: var(--cream); border-radius: 22px; width: 100%; max-width: 560px;
+    max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.5); border-top: 6px solid var(--gold);
+  }
+  .modal-header {
+    padding: 22px 26px; display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid rgba(20, 107, 71, 0.15);
+  }
+  .modal-header h2 { font-size: 20px; color: var(--emerald-deep); letter-spacing: 1px; }
+  .close-btn { background: none; border: none; font-size: 26px; cursor: pointer; color: var(--emerald); line-height: 1; }
+  .modal-body { padding: 22px 26px 28px; }
+  .field { margin-bottom: 20px; }
+  .field label { display: block; font-size: 14px; font-weight: 600; color: var(--emerald-deep); margin-bottom: 8px; }
+  .field input[type="text"], .field textarea {
+    width: 100%; padding: 12px 14px; border: 2px solid var(--emerald-mist); border-radius: 12px;
+    font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.15s; background: #fff;
+  }
+  .field input:focus, .field textarea:focus { border-color: var(--emerald-light); }
+  .field textarea { resize: vertical; min-height: 120px; line-height: 1.6; }
+  .uploader {
+    border: 2px dashed var(--emerald-light); border-radius: 14px; padding: 26px; text-align: center;
+    cursor: pointer; color: var(--emerald); background: rgba(46, 158, 107, 0.06); transition: background 0.15s;
+  }
+  .uploader:hover { background: rgba(46, 158, 107, 0.14); }
+  .uploader .icon { font-size: 34px; display: block; margin-bottom: 8px; }
+  .uploader span { font-size: 14px; }
+  .preview-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin-top: 14px; }
+  .preview-item { position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px var(--shadow); }
+  .preview-item img { width: 100%; height: 100%; object-fit: cover; }
+  .preview-item .del {
+    position: absolute; top: 3px; right: 3px; width: 22px; height: 22px; border-radius: 50%;
+    background: rgba(220, 60, 50, 0.9); color: #fff; border: none; cursor: pointer; font-size: 14px; line-height: 1;
+  }
+  .btn-submit {
+    width: 100%; padding: 14px; border: none; border-radius: 14px;
+    background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
+    color: #fff; font-size: 16px; font-weight: 700; letter-spacing: 2px; cursor: pointer;
+    box-shadow: 0 6px 18px var(--shadow); transition: transform 0.15s;
+  }
+  .btn-submit:hover { transform: translateY(-2px); }
+  .detail-imgs { display: flex; flex-direction: column; gap: 14px; margin-bottom: 22px; }
+  .detail-imgs img { width: 100%; border-radius: 14px; box-shadow: 0 4px 16px var(--shadow); }
+  .detail-text {
+    font-size: 15px; line-height: 1.9; color: var(--ink); white-space: pre-wrap;
+    background: rgba(46, 158, 107, 0.07); padding: 18px 20px; border-radius: 14px; border-left: 4px solid var(--gold);
+  }
+  .detail-actions { margin-top: 22px; display: flex; justify-content: flex-end; gap: 12px; }
+  .btn-ghost { padding: 10px 20px; border: 2px solid #d88; background: none; color: #c44; border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 600; }
+  .btn-ghost:hover { background: #c44; color: #fff; }
+  .btn-copy { padding: 10px 20px; border: 2px solid var(--emerald-light); background: none; color: var(--emerald); border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 600; }
+  .btn-copy:hover { background: var(--emerald-light); color: #fff; }
+  footer { text-align: center; padding: 20px; color: var(--emerald-mist); font-size: 12px; opacity: 0.6; }
+  .toast {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--emerald-deep); color: var(--gold-soft); padding: 12px 26px; border-radius: 30px;
+    font-size: 14px; opacity: 0; pointer-events: none; transition: all 0.3s; z-index: 200;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+  <header>
+    <div class="title"><span class="leaf">🌿</span> 提示词储存库 <span class="leaf">🌿</span></div>
+    <div class="subtitle">通往灵感的翡翠之路</div>
+  </header>
+
+  <div class="toolbar">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="搜索标题或内容...">
+    </div>
+    <button class="btn-add" onclick="openUpload()">＋ 上传新提示词</button>
+  </div>
+
+  <div class="gallery" id="gallery"></div>
+
+  <footer>🏰 绿野仙踪 · 提示词储存库 · 数据当前保存在本地浏览器</footer>
+
+  <div class="overlay" id="uploadOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>✨ 上传新提示词</h2>
+        <button class="close-btn" onclick="closeUpload()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label>标题</label>
+          <input type="text" id="inputTitle" placeholder="给这条提示词起个名字">
+        </div>
+        <div class="field">
+          <label>提示词内容</label>
+          <textarea id="inputText" placeholder="在这里写下你的提示词文字..."></textarea>
+        </div>
+        <div class="field">
+          <label>图片（可多张）</label>
+          <div class="uploader" onclick="document.getElementById('fileInput').click()">
+            <span class="icon">🖼️</span>
+            <span>点击选择图片，可一次选多张</span>
+          </div>
+          <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
+          <div class="preview-list" id="previewList"></div>
+        </div>
+        <button class="btn-submit" onclick="submitEntry()">🌟 发布到储存库</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="detailOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="detailTitle"></h2>
+        <button class="close-btn" onclick="closeDetail()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-imgs" id="detailImgs"></div>
+        <div class="detail-text" id="detailText"></div>
+        <div class="detail-actions">
+          <button class="btn-copy" onclick="copyText()">📋 复制提示词</button>
+          <button class="btn-ghost" onclick="deleteEntry()">🗑️ 删除</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+  const STORAGE_KEY = 'prompt_repository_data';
+  let entries = [];
+  let pendingImages = [];
+  let currentDetailId = null;
+
+  function loadData() {
+    try { entries = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+    catch (e) { entries = []; }
+  }
+  function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(entries)); }
+
+  function render(list) {
+    const gallery = document.getElementById('gallery');
+    const data = list || entries;
+    if (data.length === 0) {
+      gallery.innerHTML = '<div class="empty"><span class="emoji">🌱</span><p>储存库还空空如也，点击右上角上传第一条提示词吧</p></div>';
+      return;
+    }
+    gallery.innerHTML = data.map(item =>
+      '<div class="card" onclick="openDetail(\'' + item.id + '\')">' +
+      (item.images.length > 1 ? '<span class="card-badge">📷 ' + item.images.length + '</span>' : '') +
+      '<img class="card-img" src="' + (item.images[0] || placeholderImg()) + '" alt="">' +
+      '<div class="card-body"><div class="card-title">' + escapeHtml(item.title || '无标题') + '</div>' +
+      '<div class="card-desc">' + escapeHtml(item.text || '') + '</div></div></div>'
+    ).join('');
+  }
+
+  function placeholderImg() {
+    return 'data:image/svg+xml;utf8,' + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect width="400" height="300" fill="#d7f0e2"/><text x="50%" y="50%" font-size="60" text-anchor="middle" dy=".35em">🌿</text></svg>'
+    );
+  }
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, c =>
+      ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'"',"'":'&#39;'}[c]));
+  }
+
+  function openUpload() {
+    pendingImages = [];
+    document.getElementById('inputTitle').value = '';
+    document.getElementById('inputText').value = '';
+    document.getElementById('previewList').innerHTML = '';
+    document.getElementById('uploadOverlay').classList.add('show');
+  }
+  function closeUpload() { document.getElementById('uploadOverlay').classList.remove('show'); }
+
+  document.getElementById('fileInput').addEventListener('change', function(e) {
+    const files = Array.from(e.target.files);
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = ev => { pendingImages.push(ev.target.result); renderPreview(); };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = '';
+  });
+
+  function renderPreview() {
+    document.getElementById('previewList').innerHTML = pendingImages.map((img, i) =>
+      '<div class="preview-item"><img src="' + img + '"><button class="del" onclick="removePending(' + i + ')">×</button></div>'
+    ).join('');
+  }
+  function removePending(i) { pendingImages.splice(i, 1); renderPreview(); }
+
+  function submitEntry() {
+    const title = document.getElementById('inputTitle').value.trim();
+    const text = document.getElementById('inputText').value.trim();
+    if (!title && !text && pendingImages.length === 0) {
+      showToast('请至少填写标题、内容或图片'); return;
+    }
+    const entry = {
+      id: Date.now().toString(),
+      title, text, images: [...pendingImages],
+      createdAt: new Date().toLocaleString('zh-CN')
+    };
+    entries.unshift(entry);
+    try { saveData(); }
+    catch (e) { showToast('图片太多，本地空间已满'); entries.shift(); return; }
+    closeUpload(); render(); showToast('🌟 已发布到储存库');
+  }
+
+  function openDetail(id) {
+    const item = entries.find(e => e.id === id);
+    if (!item) return;
+    currentDetailId = id;
+    document.getElementById('detailTitle').textContent = item.title || '无标题';
+    document.getElementById('detailImgs').innerHTML = item.images.map(img => '<img src="' + img + '">').join('');
+    document.getElementById('detailText').textContent = item.text || '（无文字内容）';
+    document.getElementById('detailOverlay').classList.add('show');
+  }
+  function closeDetail() {
+    document.getElementById('detailOverlay').classList.remove('show');
+    currentDetailId = null;
+  }
+  function deleteEntry() {
+    if (!currentDetailId) return;
+    if (!confirm('确定删除这条提示词吗？')) return;
+    entries = entries.filter(e => e.id !== currentDetailId);
+    saveData(); closeDetail(); render(); showToast('已删除');
+  }
+  function copyText() {
+    const item = entries.find(e => e.id === currentDetailId);
+    if (!item) return;
+    navigator.clipboard.writeText(item.text || '').then(
+      () => showToast('📋 提示词已复制'),
+      () => showToast('复制失败，请手动选择')
+    );
+  }
+
+  document.getElementById('searchInput').addEventListener('input', function(e) {
+    const kw = e.target.value.trim().toLowerCase();
+    if (!kw) { render(); return; }
+    render(entries.filter(item =>
+      (item.title || '').toLowerCase().includes(kw) ||
+      (item.text || '').toLowerCase().includes(kw)
+    ));
+  });
+
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  document.querySelectorAll('.overlay').forEach(ov => {
+    ov.addEventListener('click', e => { if (e.target === ov) ov.classList.remove('show'); });
+  });
+
+  loadData();
+  render();
+</script>
+</body>
+</html>
