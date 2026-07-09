@@ -6,219 +6,604 @@
 <title>提示词储存库</title>
 <style>
   :root {
-    --emerald-deep: #0b3d2e;
-    --emerald: #146b47;
-    --emerald-light: #2e9e6b;
-    --emerald-mist: #d7f0e2;
-    --gold: #e3b23c;
-    --gold-soft: #f2d98b;
-    --cream: #f7f4e9;
-    --ink: #1c2b24;
-    --shadow: rgba(11, 61, 46, 0.25);
+    --bg: #f6f8f5;
+    --surface: #ffffff;
+    --surface-soft: #eef4ef;
+    --text: #16211b;
+    --muted: #6c7a70;
+    --line: #dfe7e1;
+    --green: #1f6f48;
+    --green-2: #2f8b5b;
+    --green-soft: #dfeee5;
+    --yellow: #c9a227;
+    --danger: #b54747;
+    --shadow: 0 12px 36px rgba(22, 33, 27, 0.08);
   }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  * { box-sizing: border-box; }
+
   body {
-    font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
-    background:
-      radial-gradient(circle at 20% 10%, rgba(46, 158, 107, 0.18), transparent 40%),
-      radial-gradient(circle at 80% 90%, rgba(227, 178, 60, 0.15), transparent 45%),
-      linear-gradient(160deg, #0b3d2e 0%, #0f4d38 40%, #14603f 100%);
-    background-attachment: fixed;
-    color: var(--ink);
+    margin: 0;
     min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: var(--text);
+    background: var(--bg);
   }
-  header { text-align: center; padding: 46px 20px 30px; position: relative; }
-  .title {
-    font-size: clamp(30px, 6vw, 52px);
-    font-weight: 800; letter-spacing: 4px; color: var(--cream);
-    text-shadow: 0 2px 0 var(--emerald-deep), 0 6px 20px rgba(0,0,0,0.4);
+
+  button, input, textarea {
+    font: inherit;
   }
-  .title .leaf { color: var(--gold-soft); }
-  .subtitle {
-    margin-top: 12px; color: var(--emerald-mist);
-    font-size: 15px; letter-spacing: 2px; opacity: 0.85;
+
+  button {
+    cursor: pointer;
   }
-  .subtitle::before, .subtitle::after {
-    content: "✦"; color: var(--gold); margin: 0 10px; font-size: 12px;
+
+  .app {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 28px 18px 56px;
   }
-  .toolbar {
-    max-width: 1100px; margin: 0 auto 24px; padding: 0 20px;
-    display: flex; justify-content: space-between; align-items: center;
-    flex-wrap: wrap; gap: 14px;
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 28px;
   }
-  .search-box { flex: 1; min-width: 200px; max-width: 420px; position: relative; }
-  .search-box input {
-    width: 100%; padding: 12px 16px 12px 42px; border: none; border-radius: 30px;
-    background: rgba(247, 244, 233, 0.95); font-size: 14px; outline: none;
-    box-shadow: 0 4px 14px var(--shadow);
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
   }
-  .search-box::before {
-    content: "🔍"; position: absolute; left: 15px; top: 50%;
-    transform: translateY(-50%); font-size: 15px; opacity: 0.6;
+
+  .brand-mark {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: var(--green);
+    color: white;
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    box-shadow: 0 8px 18px rgba(31, 111, 72, 0.18);
+    flex: 0 0 auto;
   }
-  .btn-add {
-    display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px;
-    border: none; border-radius: 30px;
-    background: linear-gradient(135deg, var(--gold), var(--gold-soft));
-    color: var(--emerald-deep); font-size: 15px; font-weight: 700; cursor: pointer;
-    box-shadow: 0 4px 16px rgba(227, 178, 60, 0.45); transition: transform 0.15s, box-shadow 0.15s;
+
+  .brand h1 {
+    margin: 0;
+    font-size: 22px;
+    line-height: 1.2;
+    letter-spacing: 0;
   }
-  .btn-add:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(227, 178, 60, 0.6); }
-  .btn-add:active { transform: translateY(0); }
-  .gallery {
-    max-width: 1100px; margin: 0 auto; padding: 0 20px 60px;
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 22px;
+
+  .brand p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 13px;
   }
+
+  .primary-btn {
+    border: 0;
+    height: 42px;
+    padding: 0 16px;
+    border-radius: 10px;
+    background: var(--green);
+    color: white;
+    font-weight: 650;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    box-shadow: 0 10px 22px rgba(31, 111, 72, 0.18);
+  }
+
+  .primary-btn:hover {
+    background: #185d3c;
+  }
+
+  .content-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 18px;
+    margin-bottom: 18px;
+  }
+
+  .section-title h2 {
+    margin: 0;
+    font-size: 18px;
+    letter-spacing: 0;
+  }
+
+  .section-title p {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .search {
+    position: relative;
+    width: min(360px, 100%);
+  }
+
+  .search input {
+    width: 100%;
+    height: 42px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: white;
+    padding: 0 14px 0 40px;
+    outline: none;
+    color: var(--text);
+  }
+
+  .search input:focus {
+    border-color: var(--green-2);
+    box-shadow: 0 0 0 4px rgba(47, 139, 91, 0.12);
+  }
+
+  .search::before {
+    content: "";
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #8a988f;
+    border-radius: 50%;
+    transform: translateY(-50%);
+  }
+
+  .search::after {
+    content: "";
+    position: absolute;
+    left: 27px;
+    top: 27px;
+    width: 8px;
+    height: 2px;
+    background: #8a988f;
+    transform: rotate(45deg);
+    border-radius: 10px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(238px, 1fr));
+    gap: 16px;
+  }
+
   .card {
-    background: var(--cream); border-radius: 18px; overflow: hidden; cursor: pointer;
-    box-shadow: 0 6px 20px var(--shadow); transition: transform 0.2s, box-shadow 0.2s;
-    border: 2px solid transparent; position: relative;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 0 rgba(22, 33, 27, 0.02);
+    transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
   }
+
   .card:hover {
-    transform: translateY(-6px); box-shadow: 0 14px 32px rgba(11, 61, 46, 0.4);
-    border-color: var(--gold-soft);
+    transform: translateY(-2px);
+    border-color: #c7d8cc;
+    box-shadow: var(--shadow);
   }
-  .card-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; background: var(--emerald-mist); }
-  .card-badge {
-    position: absolute; top: 12px; right: 12px; background: rgba(11, 61, 46, 0.8);
-    color: var(--gold-soft); font-size: 12px; padding: 4px 10px; border-radius: 20px; backdrop-filter: blur(4px);
+
+  .thumb {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    background: linear-gradient(135deg, #e8efe9, #f7f9f6);
+    overflow: hidden;
   }
-  .card-body { padding: 14px 16px 18px; }
+
+  .thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .thumb-empty {
+    height: 100%;
+    display: grid;
+    place-items: center;
+    color: var(--green);
+    font-size: 28px;
+    font-weight: 800;
+  }
+
+  .count {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    min-width: 28px;
+    height: 24px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: rgba(22, 33, 27, 0.72);
+    color: white;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+  }
+
+  .card-body {
+    padding: 14px 14px 16px;
+  }
+
   .card-title {
-    font-size: 16px; font-weight: 700; color: var(--emerald-deep); margin-bottom: 6px;
-    display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.35;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
-  .card-desc {
-    font-size: 13px; color: #5a6b62; line-height: 1.5;
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+
+  .card-text {
+    margin: 8px 0 0;
+    min-height: 42px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
-  .empty { grid-column: 1 / -1; text-align: center; padding: 70px 20px; color: var(--emerald-mist); }
-  .empty .emoji { font-size: 60px; display: block; margin-bottom: 16px; }
-  .empty p { font-size: 16px; opacity: 0.85; }
+
+  .card-meta {
+    margin-top: 12px;
+    color: #92a098;
+    font-size: 12px;
+  }
+
+  .empty {
+    grid-column: 1 / -1;
+    border: 1px dashed #cbd8cf;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.62);
+    min-height: 260px;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding: 30px;
+  }
+
+  .empty strong {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 16px;
+  }
+
+  .empty span {
+    color: var(--muted);
+    font-size: 14px;
+  }
+
   .overlay {
-    position: fixed; inset: 0; background: rgba(7, 32, 24, 0.7); backdrop-filter: blur(4px);
-    display: none; align-items: center; justify-content: center; padding: 20px; z-index: 100;
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    background: rgba(12, 18, 15, 0.45);
   }
-  .overlay.show { display: flex; }
+
+  .overlay.show {
+    display: flex;
+  }
+
   .modal {
-    background: var(--cream); border-radius: 22px; width: 100%; max-width: 560px;
-    max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.5); border-top: 6px solid var(--gold);
+    width: min(680px, 100%);
+    max-height: min(820px, 92vh);
+    overflow: auto;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.22);
   }
-  .modal-header {
-    padding: 22px 26px; display: flex; justify-content: space-between; align-items: center;
-    border-bottom: 1px solid rgba(20, 107, 71, 0.15);
+
+  .modal-head {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    min-height: 62px;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
   }
-  .modal-header h2 { font-size: 20px; color: var(--emerald-deep); letter-spacing: 1px; }
-  .close-btn { background: none; border: none; font-size: 26px; cursor: pointer; color: var(--emerald); line-height: 1; }
-  .modal-body { padding: 22px 26px 28px; }
-  .field { margin-bottom: 20px; }
-  .field label { display: block; font-size: 14px; font-weight: 600; color: var(--emerald-deep); margin-bottom: 8px; }
-  .field input[type="text"], .field textarea {
-    width: 100%; padding: 12px 14px; border: 2px solid var(--emerald-mist); border-radius: 12px;
-    font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.15s; background: #fff;
+
+  .modal-head h3 {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.35;
   }
-  .field input:focus, .field textarea:focus { border-color: var(--emerald-light); }
-  .field textarea { resize: vertical; min-height: 120px; line-height: 1.6; }
-  .uploader {
-    border: 2px dashed var(--emerald-light); border-radius: 14px; padding: 26px; text-align: center;
-    cursor: pointer; color: var(--emerald); background: rgba(46, 158, 107, 0.06); transition: background 0.15s;
+
+  .icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    border: 1px solid var(--line);
+    background: white;
+    color: var(--text);
+    display: grid;
+    place-items: center;
+    font-size: 20px;
   }
-  .uploader:hover { background: rgba(46, 158, 107, 0.14); }
-  .uploader .icon { font-size: 34px; display: block; margin-bottom: 8px; }
-  .uploader span { font-size: 14px; }
-  .preview-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin-top: 14px; }
-  .preview-item { position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px var(--shadow); }
-  .preview-item img { width: 100%; height: 100%; object-fit: cover; }
-  .preview-item .del {
-    position: absolute; top: 3px; right: 3px; width: 22px; height: 22px; border-radius: 50%;
-    background: rgba(220, 60, 50, 0.9); color: #fff; border: none; cursor: pointer; font-size: 14px; line-height: 1;
+
+  .icon-btn:hover {
+    background: var(--surface-soft);
   }
-  .btn-submit {
-    width: 100%; padding: 14px; border: none; border-radius: 14px;
-    background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
-    color: #fff; font-size: 16px; font-weight: 700; letter-spacing: 2px; cursor: pointer;
-    box-shadow: 0 6px 18px var(--shadow); transition: transform 0.15s;
+
+  .modal-body {
+    padding: 18px;
   }
-  .btn-submit:hover { transform: translateY(-2px); }
-  .detail-imgs { display: flex; flex-direction: column; gap: 14px; margin-bottom: 22px; }
-  .detail-imgs img { width: 100%; border-radius: 14px; box-shadow: 0 4px 16px var(--shadow); }
+
+  .field {
+    margin-bottom: 16px;
+  }
+
+  .field label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 650;
+    color: #35423a;
+  }
+
+  .field input,
+  .field textarea {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: white;
+    outline: none;
+    color: var(--text);
+  }
+
+  .field input {
+    height: 42px;
+    padding: 0 12px;
+  }
+
+  .field textarea {
+    min-height: 150px;
+    padding: 12px;
+    resize: vertical;
+    line-height: 1.7;
+  }
+
+  .field input:focus,
+  .field textarea:focus {
+    border-color: var(--green-2);
+    box-shadow: 0 0 0 4px rgba(47, 139, 91, 0.12);
+  }
+
+  .upload-box {
+    min-height: 112px;
+    border: 1px dashed #b9c9bf;
+    border-radius: 12px;
+    background: #fbfcfb;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding: 18px;
+  }
+
+  .upload-box strong {
+    display: block;
+    color: var(--green);
+    font-size: 14px;
+  }
+
+  .upload-box span {
+    display: block;
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .previews {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .preview {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--surface-soft);
+  }
+
+  .preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .preview button {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.62);
+    color: white;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .secondary-btn,
+  .danger-btn {
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 10px;
+    background: white;
+    font-weight: 650;
+  }
+
+  .secondary-btn {
+    border: 1px solid var(--line);
+    color: var(--text);
+  }
+
+  .danger-btn {
+    border: 1px solid #e5c7c7;
+    color: var(--danger);
+  }
+
+  .detail-images {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .detail-images img {
+    width: 100%;
+    border-radius: 12px;
+    display: block;
+  }
+
   .detail-text {
-    font-size: 15px; line-height: 1.9; color: var(--ink); white-space: pre-wrap;
-    background: rgba(46, 158, 107, 0.07); padding: 18px 20px; border-radius: 14px; border-left: 4px solid var(--gold);
+    white-space: pre-wrap;
+    line-height: 1.8;
+    font-size: 15px;
+    padding: 16px;
+    border-radius: 12px;
+    background: var(--surface-soft);
   }
-  .detail-actions { margin-top: 22px; display: flex; justify-content: flex-end; gap: 12px; }
-  .btn-ghost { padding: 10px 20px; border: 2px solid #d88; background: none; color: #c44; border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 600; }
-  .btn-ghost:hover { background: #c44; color: #fff; }
-  .btn-copy { padding: 10px 20px; border: 2px solid var(--emerald-light); background: none; color: var(--emerald); border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 600; }
-  .btn-copy:hover { background: var(--emerald-light); color: #fff; }
-  footer { text-align: center; padding: 20px; color: var(--emerald-mist); font-size: 12px; opacity: 0.6; }
+
   .toast {
-    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
-    background: var(--emerald-deep); color: var(--gold-soft); padding: 12px 26px; border-radius: 30px;
-    font-size: 14px; opacity: 0; pointer-events: none; transition: all 0.3s; z-index: 200;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    z-index: 40;
+    transform: translate(-50%, 14px);
+    opacity: 0;
+    pointer-events: none;
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: #16211b;
+    color: white;
+    font-size: 13px;
+    transition: 0.18s ease;
   }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .toast.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  @media (max-width: 680px) {
+    .app { padding: 20px 14px 40px; }
+    .topbar { align-items: flex-start; }
+    .brand h1 { font-size: 20px; }
+    .brand p { display: none; }
+    .primary-btn { height: 40px; padding: 0 12px; }
+    .content-head { grid-template-columns: 1fr; align-items: stretch; }
+    .search { width: 100%; }
+    .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+    .card-body { padding: 12px; }
+    .modal { border-radius: 12px; }
+    .modal-body { padding: 16px; }
+    .actions { flex-wrap: wrap; }
+    .actions button { flex: 1; }
+  }
 </style>
 </head>
 <body>
-  <header>
-    <div class="title"><span class="leaf">🌿</span> 提示词储存库 <span class="leaf">🌿</span></div>
-    <div class="subtitle">通往灵感的翡翠之路</div>
-  </header>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">P</div>
+        <div>
+          <h1>提示词储存库</h1>
+          <p>保存图文提示词，快速浏览与复制</p>
+        </div>
+      </div>
+      <button class="primary-btn" onclick="openUpload()">+ 新建</button>
+    </header>
 
-  <div class="toolbar">
-    <div class="search-box">
-      <input type="text" id="searchInput" placeholder="搜索标题或内容...">
-    </div>
-    <button class="btn-add" onclick="openUpload()">＋ 上传新提示词</button>
-  </div>
+    <section class="content-head">
+      <div class="section-title">
+        <h2>全部内容</h2>
+        <p id="countText">0 条提示词</p>
+      </div>
+      <div class="search">
+        <input id="searchInput" type="search" placeholder="搜索标题或内容">
+      </div>
+    </section>
 
-  <div class="gallery" id="gallery"></div>
-
-  <footer>🏰 绿野仙踪 · 提示词储存库 · 数据当前保存在本地浏览器</footer>
+    <section class="grid" id="gallery"></section>
+  </main>
 
   <div class="overlay" id="uploadOverlay">
     <div class="modal">
-      <div class="modal-header">
-        <h2>✨ 上传新提示词</h2>
-        <button class="close-btn" onclick="closeUpload()">×</button>
+      <div class="modal-head">
+        <h3>新建提示词</h3>
+        <button class="icon-btn" onclick="closeUpload()" aria-label="关闭">×</button>
       </div>
       <div class="modal-body">
         <div class="field">
-          <label>标题</label>
-          <input type="text" id="inputTitle" placeholder="给这条提示词起个名字">
+          <label for="inputTitle">标题</label>
+          <input id="inputTitle" type="text" placeholder="例如：森林系人物摄影">
         </div>
         <div class="field">
-          <label>提示词内容</label>
-          <textarea id="inputText" placeholder="在这里写下你的提示词文字..."></textarea>
+          <label for="inputText">内容</label>
+          <textarea id="inputText" placeholder="粘贴或输入完整提示词"></textarea>
         </div>
         <div class="field">
-          <label>图片（可多张）</label>
-          <div class="uploader" onclick="document.getElementById('fileInput').click()">
-            <span class="icon">🖼️</span>
-            <span>点击选择图片，可一次选多张</span>
+          <label>图片</label>
+          <div class="upload-box" onclick="document.getElementById('fileInput').click()">
+            <div>
+              <strong>选择图片</strong>
+              <span>支持多张图片，第一张会作为封面</span>
+            </div>
           </div>
-          <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
-          <div class="preview-list" id="previewList"></div>
+          <input id="fileInput" type="file" accept="image/*" multiple hidden>
+          <div class="previews" id="previewList"></div>
         </div>
-        <button class="btn-submit" onclick="submitEntry()">🌟 发布到储存库</button>
+        <div class="actions">
+          <button class="secondary-btn" onclick="closeUpload()">取消</button>
+          <button class="primary-btn" onclick="submitEntry()">保存</button>
+        </div>
       </div>
     </div>
   </div>
 
   <div class="overlay" id="detailOverlay">
     <div class="modal">
-      <div class="modal-header">
-        <h2 id="detailTitle"></h2>
-        <button class="close-btn" onclick="closeDetail()">×</button>
+      <div class="modal-head">
+        <h3 id="detailTitle"></h3>
+        <button class="icon-btn" onclick="closeDetail()" aria-label="关闭">×</button>
       </div>
       <div class="modal-body">
-        <div class="detail-imgs" id="detailImgs"></div>
+        <div class="detail-images" id="detailImgs"></div>
         <div class="detail-text" id="detailText"></div>
-        <div class="detail-actions">
-          <button class="btn-copy" onclick="copyText()">📋 复制提示词</button>
-          <button class="btn-ghost" onclick="deleteEntry()">🗑️ 删除</button>
+        <div class="actions">
+          <button class="danger-btn" onclick="deleteEntry()">删除</button>
+          <button class="secondary-btn" onclick="copyText()">复制文字</button>
         </div>
       </div>
     </div>
@@ -227,7 +612,7 @@
   <div class="toast" id="toast"></div>
 
 <script>
-  const STORAGE_KEY = 'prompt_repository_data';
+  const STORAGE_KEY = 'prompt_repository_data_v2';
   let entries = [];
   let pendingImages = [];
   let currentDetailId = null;
@@ -236,32 +621,46 @@
     try { entries = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
     catch (e) { entries = []; }
   }
-  function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(entries)); }
+
+  function saveData() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+  }
+
+  function formatDate(value) {
+    return new Date(value).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
+  }
 
   function render(list) {
     const gallery = document.getElementById('gallery');
     const data = list || entries;
+    document.getElementById('countText').textContent = entries.length + ' 条提示词';
+
     if (data.length === 0) {
-      gallery.innerHTML = '<div class="empty"><span class="emoji">🌱</span><p>储存库还空空如也，点击右上角上传第一条提示词吧</p></div>';
+      gallery.innerHTML = '<div class="empty"><div><strong>还没有内容</strong><span>点击右上角新建，添加第一条图文提示词。</span></div></div>';
       return;
     }
-    gallery.innerHTML = data.map(item =>
-      '<div class="card" onclick="openDetail(\'' + item.id + '\')">' +
-      (item.images.length > 1 ? '<span class="card-badge">📷 ' + item.images.length + '</span>' : '') +
-      '<img class="card-img" src="' + (item.images[0] || placeholderImg()) + '" alt="">' +
-      '<div class="card-body"><div class="card-title">' + escapeHtml(item.title || '无标题') + '</div>' +
-      '<div class="card-desc">' + escapeHtml(item.text || '') + '</div></div></div>'
-    ).join('');
+
+    gallery.innerHTML = data.map(item => {
+      const image = item.images && item.images[0]
+        ? '<img src="' + item.images[0] + '" alt="">'
+        : '<div class="thumb-empty">P</div>';
+      const count = item.images && item.images.length > 1
+        ? '<span class="count">' + item.images.length + '</span>'
+        : '';
+      return '<article class="card" onclick="openDetail(\'' + item.id + '\')">' +
+        '<div class="thumb">' + image + count + '</div>' +
+        '<div class="card-body">' +
+        '<h3 class="card-title">' + escapeHtml(item.title || '未命名提示词') + '</h3>' +
+        '<p class="card-text">' + escapeHtml(item.text || '无文字内容') + '</p>' +
+        '<div class="card-meta">' + formatDate(item.createdAt) + '</div>' +
+        '</div></article>';
+    }).join('');
   }
 
-  function placeholderImg() {
-    return 'data:image/svg+xml;utf8,' + encodeURIComponent(
-      '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect width="400" height="300" fill="#d7f0e2"/><text x="50%" y="50%" font-size="60" text-anchor="middle" dy=".35em">🌿</text></svg>'
-    );
-  }
   function escapeHtml(str) {
-    return String(str).replace(/[&<>"']/g, c =>
-      ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'"',"'":'&#39;'}[c]));
+    return String(str).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '"', "'": '&#39;'
+    }[c]));
   }
 
   function openUpload() {
@@ -271,90 +670,125 @@
     document.getElementById('previewList').innerHTML = '';
     document.getElementById('uploadOverlay').classList.add('show');
   }
-  function closeUpload() { document.getElementById('uploadOverlay').classList.remove('show'); }
+
+  function closeUpload() {
+    document.getElementById('uploadOverlay').classList.remove('show');
+  }
 
   document.getElementById('fileInput').addEventListener('change', function(e) {
-    const files = Array.from(e.target.files);
-    files.forEach(file => {
+    Array.from(e.target.files).forEach(file => {
       const reader = new FileReader();
-      reader.onload = ev => { pendingImages.push(ev.target.result); renderPreview(); };
+      reader.onload = event => {
+        pendingImages.push(event.target.result);
+        renderPreview();
+      };
       reader.readAsDataURL(file);
     });
     e.target.value = '';
   });
 
   function renderPreview() {
-    document.getElementById('previewList').innerHTML = pendingImages.map((img, i) =>
-      '<div class="preview-item"><img src="' + img + '"><button class="del" onclick="removePending(' + i + ')">×</button></div>'
+    document.getElementById('previewList').innerHTML = pendingImages.map((img, index) =>
+      '<div class="preview"><img src="' + img + '" alt=""><button onclick="removePending(event,' + index + ')">×</button></div>'
     ).join('');
   }
-  function removePending(i) { pendingImages.splice(i, 1); renderPreview(); }
+
+  function removePending(event, index) {
+    event.stopPropagation();
+    pendingImages.splice(index, 1);
+    renderPreview();
+  }
 
   function submitEntry() {
     const title = document.getElementById('inputTitle').value.trim();
     const text = document.getElementById('inputText').value.trim();
     if (!title && !text && pendingImages.length === 0) {
-      showToast('请至少填写标题、内容或图片'); return;
+      showToast('请至少添加一项内容');
+      return;
     }
+
     const entry = {
-      id: Date.now().toString(),
-      title, text, images: [...pendingImages],
-      createdAt: new Date().toLocaleString('zh-CN')
+      id: String(Date.now()),
+      title,
+      text,
+      images: [...pendingImages],
+      createdAt: new Date().toISOString()
     };
+
     entries.unshift(entry);
     try { saveData(); }
-    catch (e) { showToast('图片太多，本地空间已满'); entries.shift(); return; }
-    closeUpload(); render(); showToast('🌟 已发布到储存库');
+    catch (e) {
+      entries.shift();
+      showToast('图片过大，本地空间不足');
+      return;
+    }
+
+    closeUpload();
+    render();
+    showToast('已保存');
   }
 
   function openDetail(id) {
-    const item = entries.find(e => e.id === id);
+    const item = entries.find(entry => entry.id === id);
     if (!item) return;
+
     currentDetailId = id;
-    document.getElementById('detailTitle').textContent = item.title || '无标题';
-    document.getElementById('detailImgs').innerHTML = item.images.map(img => '<img src="' + img + '">').join('');
-    document.getElementById('detailText').textContent = item.text || '（无文字内容）';
+    document.getElementById('detailTitle').textContent = item.title || '未命名提示词';
+    document.getElementById('detailImgs').innerHTML = (item.images || []).map(img => '<img src="' + img + '" alt="">').join('');
+    document.getElementById('detailText').textContent = item.text || '无文字内容';
     document.getElementById('detailOverlay').classList.add('show');
   }
+
   function closeDetail() {
     document.getElementById('detailOverlay').classList.remove('show');
     currentDetailId = null;
   }
+
   function deleteEntry() {
-    if (!currentDetailId) return;
-    if (!confirm('确定删除这条提示词吗？')) return;
-    entries = entries.filter(e => e.id !== currentDetailId);
-    saveData(); closeDetail(); render(); showToast('已删除');
+    if (!currentDetailId || !confirm('确定删除这条提示词吗？')) return;
+    entries = entries.filter(entry => entry.id !== currentDetailId);
+    saveData();
+    closeDetail();
+    renderFiltered();
+    showToast('已删除');
   }
+
   function copyText() {
-    const item = entries.find(e => e.id === currentDetailId);
+    const item = entries.find(entry => entry.id === currentDetailId);
     if (!item) return;
     navigator.clipboard.writeText(item.text || '').then(
-      () => showToast('📋 提示词已复制'),
-      () => showToast('复制失败，请手动选择')
+      () => showToast('已复制'),
+      () => showToast('复制失败')
     );
   }
 
-  document.getElementById('searchInput').addEventListener('input', function(e) {
-    const kw = e.target.value.trim().toLowerCase();
-    if (!kw) { render(); return; }
-    render(entries.filter(item =>
-      (item.title || '').toLowerCase().includes(kw) ||
-      (item.text || '').toLowerCase().includes(kw)
-    ));
-  });
+  document.getElementById('searchInput').addEventListener('input', renderFiltered);
 
-  let toastTimer;
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+  function renderFiltered() {
+    const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+    if (!keyword) {
+      render();
+      return;
+    }
+    render(entries.filter(item =>
+      (item.title || '').toLowerCase().includes(keyword) ||
+      (item.text || '').toLowerCase().includes(keyword)
+    ));
   }
 
-  document.querySelectorAll('.overlay').forEach(ov => {
-    ov.addEventListener('click', e => { if (e.target === ov) ov.classList.remove('show'); });
+  let toastTimer;
+  function showToast(text) {
+    const toast = document.getElementById('toast');
+    toast.textContent = text;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
+  }
+
+  document.querySelectorAll('.overlay').forEach(overlay => {
+    overlay.addEventListener('click', event => {
+      if (event.target === overlay) overlay.classList.remove('show');
+    });
   });
 
   loadData();
